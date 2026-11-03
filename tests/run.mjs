@@ -281,7 +281,7 @@ function callRoute(handler, method, url, body) {
   const a = unfinished.find((row) => row.id === 'sess-a')
   const b = unfinished.find((row) => row.id === 'sess-b')
   check('sessions: 未收尾识别', a !== undefined && a.title === 'readable-diagrams 发布准备', JSON.stringify(unfinished.map((row) => row.id)))
-  check('sessions: 原因', a.reasons.includes('还有 1 步没做完') && a.reasons.includes('目标还在进行'), JSON.stringify(a.reasons))
+  check('sessions: 原因码', a.reasons.some((reason) => reason.code === 'todos' && reason.count === 1) && a.reasons.some((reason) => reason.code === 'goal'), JSON.stringify(a.reasons))
   check('sessions: 7 天没动静 → 休眠', b !== undefined && b.category === 'dormant', JSON.stringify(b?.category))
   check('sessions: 子代理会话排除', unfinished.every((row) => row.id !== 'sess-child'), JSON.stringify(unfinished.map((row) => row.id)))
   check('sessions: 团队任务明细', Array.isArray(a.teamTasks) && a.teamTasks.includes('华纹纹理层：砖瓦'), JSON.stringify(a.teamTasks))

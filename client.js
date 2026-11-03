@@ -38,6 +38,7 @@ window.__ModuleLoader__.load({
     function lang() {
       const html = String(document.documentElement?.lang || '').toLowerCase()
       if (html.startsWith('zh')) return 'zh'
+      if (html.startsWith('en')) return 'en'
       const nav = String(navigator.languages?.[0] || navigator.language || '').toLowerCase()
       return nav.startsWith('zh') ? 'zh' : 'en'
     }
@@ -90,6 +91,13 @@ window.__ModuleLoader__.load({
           release: '最近发布',
           reviewing: '审核中',
           localVersion: '本地',
+          reasonWaiting: '等你回答',
+          reasonTodos: (n) => `还有 ${n} 步没做完`,
+          reasonGoal: '目标还在进行',
+          reasonPlan: '计划还开着',
+          reasonTeam: (n) => `团队还有 ${n} 个任务`,
+          reasonRunning: '正在跑',
+          manualFirst: '手动标记优先',
           rebind: '换项目',
           noProject: '这个对话还没绑定项目',
           endSession: '这个对话收尾了',
@@ -168,6 +176,13 @@ window.__ModuleLoader__.load({
           release: 'Last release',
           reviewing: 'In review',
           localVersion: 'Local',
+          reasonWaiting: 'waiting for you',
+          reasonTodos: (n) => `${n} steps left`,
+          reasonGoal: 'goal still active',
+          reasonPlan: 'plan still open',
+          reasonTeam: (n) => `${n} team tasks left`,
+          reasonRunning: 'running',
+          manualFirst: 'manual marks win',
           rebind: 'Change',
           noProject: 'This conversation is not bound to a project',
           endSession: 'This conversation is done',
@@ -456,9 +471,10 @@ window.__ModuleLoader__.load({
 
     function counts(now = Date.now()) {
       const open = openTasks()
+      const waiting = state.sessions.filter((info) => info.category === 'wait').length
       return {
         open: open.length,
-        actionable: open.filter((task) => isActionable(task, now)).length,
+        actionable: open.filter((task) => isActionable(task, now)).length + waiting,
       }
     }
 
@@ -483,6 +499,21 @@ window.__ModuleLoader__.load({
         }
       }
       return projectName(task)
+    }
+
+    /** 把宿主返回的原因码翻译成当前语言。 */
+    function reasonText(reason) {
+      if (typeof reason === 'string') return reason
+      if (reason === null || typeof reason !== 'object') return ''
+      switch (reason.code) {
+        case 'waiting': return T.reasonWaiting
+        case 'todos': return T.reasonTodos(reason.count ?? 0)
+        case 'goal': return T.reasonGoal
+        case 'plan': return T.reasonPlan
+        case 'team': return T.reasonTeam(reason.count ?? 0)
+        case 'running': return T.reasonRunning
+        default: return ''
+      }
     }
 
     /** 一条任务的副标题：来源 + 时间。 */
@@ -964,6 +995,7 @@ window.__ModuleLoader__.load({
 
       const bits = []
       if (open.length > 0) bits.push(T.count(open.length))
+      if (waitSessions.length > 0) bits.push(`${waitSessions.length} ${T.waitingTag}`)
       if (liveSessions.length > 0) bits.push(`${liveSessions.length} ${T.running}`)
       if (state.schedules.length > 0) bits.push(`${state.schedules.length} ${T.scheduled}`)
       sub.textContent = bits.join(' · ')
@@ -1052,7 +1084,10 @@ window.__ModuleLoader__.load({
       const meta = document.createElement('span')
       meta.className = 'fu-meta'
       const bits = []
-      if (Array.isArray(info.reasons) && info.reasons.length > 0) bits.push(info.reasons.join(' · '))
+      if (Array.isArray(info.reasons) && info.reasons.length > 0) {
+        const text = info.reasons.map(reasonText).filter(Boolean).join(' · ')
+        if (text.length > 0) bits.push(text)
+      }
       if (typeof info.lastPromptAt === 'number') bits.push(formatAge(info.lastPromptAt))
       meta.textContent = bits.join(' · ')
       main.appendChild(titleLine(sessionTag(info), info.title))
@@ -1196,20 +1231,38 @@ window.__ModuleLoader__.load({
       else openSheet()
     }
 
-    // 到点/搁置的轻提示：每次页面加载最多一条，点一下进面板，8 秒自己走。
-    let toastShown = false
+    // 到点/搁置的轻提示：出现新的到期项就弹，60 秒内最多一条。
+    let seenActionable = new Set()
+    let lastToastAt = 0
+    const TOAST_GAP_MS = 60_000
+
+    function actionableKeys(now = Date.now()) {
+      const keys = new Set()
+      for (const task of state.tasks) if (isActionable(task, now)) keys.add(`t:${task.id}`)
+      for (const info of state.sessions) if (info.category === 'wait') keys.add(`s:${info.id}`)
+      return keys
+    }
+
     function maybeToast() {
-      if (toastShown || sheetOpen || document.visibilityState === 'hidden') return
-      const { actionable } = counts()
-      if (actionable === 0) return
-      toastShown = true
+      const now = Date.now()
+      const keys = actionableKeys(now)
+      const isNew = [...keys].some((key) => !seenActionable.has(key))
+      seenActionable = keys
+      if (keys.size === 0) return
+      if (sheetOpen || document.visibilityState === 'hidden') return
+      if (!isNew || now - lastToastAt < TOAST_GAP_MS) return
+      lastToastAt = now
+      showDueToast(keys.size)
+    }
+
+    function showDueToast(count) {
       const toast = document.createElement('button')
       toast.type = 'button'
       toast.className = 'fu-toast'
       toast.title = T.entry
       const dot = document.createElement('span'); dot.className = 'fu-toast-dot'
       const text = document.createElement('span'); text.className = 'fu-toast-text'
-      text.textContent = T.dueCount(actionable)
+      text.textContent = T.dueCount(count)
       const go = document.createElement('span'); go.className = 'fu-toast-go'
       go.textContent = zh ? '看看' : 'View'
       toast.appendChild(dot); toast.appendChild(text); toast.appendChild(go)
@@ -1309,15 +1362,24 @@ window.__ModuleLoader__.load({
     }
 
     /** 自动检测到的事实，一行灰字。 */
-    function autoFactsText(facts) {
+    function autoFactsText(project) {
+      const facts = project?.facts ?? {}
+      const manual = project?.mark?.channels ?? {}
+      const has = (key) => Object.prototype.hasOwnProperty.call(manual, key)
       const bits = []
-      if (typeof facts?.tag === 'string' && facts.tag.length > 0) bits.push(`tag ${facts.tag}`)
-      if (facts?.npm === 'none') bits.push(zh ? 'npm 未发' : 'npm none')
-      else if (typeof facts?.npm === 'string' && facts.npm.length > 0) bits.push(`npm ${facts.npm}`)
-      if (facts?.market === true) bits.push(zh ? '市场已收录' : 'market listed')
-      else if (facts?.market === false) bits.push(zh ? '市场未收录' : 'market not listed')
-      if (facts?.dirty === true) bits.push(T.dirty)
-      return `${T.autoFacts}: ${bits.length > 0 ? bits.join(' · ') : '—'}`
+      if (!has('github') && typeof facts.tag === 'string' && facts.tag.length > 0) bits.push(`tag ${facts.tag}`)
+      if (!has('npm')) {
+        if (facts.npm === 'none') bits.push(zh ? 'npm 未发' : 'npm none')
+        else if (typeof facts.npm === 'string' && facts.npm.length > 0) bits.push(`npm ${facts.npm}`)
+      }
+      if (!has('market')) {
+        if (facts.market === true) bits.push(zh ? '市场已收录' : 'market listed')
+        else if (facts.market === false) bits.push(zh ? '市场未收录' : 'market not listed')
+      }
+      if (facts.dirty === true) bits.push(T.dirty)
+      const manualCount = ['github', 'npm', 'market', 'site'].filter(has).length
+      const suffix = manualCount > 0 ? ` · ${T.manualFirst}` : ''
+      return `${T.autoFacts}: ${bits.length > 0 ? bits.join(' · ') : '—'}${suffix}`
     }
 
     /** 弹层内容。 */
@@ -1457,7 +1519,7 @@ window.__ModuleLoader__.load({
             }, label)
           }),
         ))
-        children.push(React.createElement('div', { className: 'fu-pop-facts', key: 'facts' }, autoFactsText(project.facts)))
+        children.push(React.createElement('div', { className: 'fu-pop-facts', key: 'facts' }, autoFactsText(project)))
         children.push(React.createElement('button', {
           type: 'button',
           className: 'fu-pop-end',

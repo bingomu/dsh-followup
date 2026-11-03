@@ -77,7 +77,7 @@
       homepage: 'https://github.com/bingomu/readable-diagrams#readme',
       private: false,
       channel: { devDone: true, github: true, npm: false, market: false, site: true },
-      mark: { devDone: true, channels: { github: true, site: true } },
+      mark: { devDone: true, channels: { github: true, site: true, market: 'pending' } },
       releases: { local: '1.1.0', channels: {
         github: { state: 'on', version: '1.1.0' },
         npm: { state: 'off', version: null },
@@ -108,9 +108,9 @@
         { id: 'f-4', title: '把全局任务层的方案定下来', done: true, doneAt: now - DAY, createdAt: now - 3 * DAY, updatedAt: now - DAY, source: { sessionId: 's1', cwd: '/x' } },
       ],
       sessions: [
-        { id: 's-wait', title: '华纹主题系列包发布前独立验收', category: 'wait', reasons: ['等你回答'], lastPromptAt: now - 40 * 60 * 1000, cwd: '/x/huawen', projectName: 'huawen' },
-        { id: 's-idle', title: '图片预览插件开发与发布', category: 'idle', reasons: ['还有 2 步没做完', '团队还有 2 个任务'], teamTasks: ['华纹纹理层：砖瓦 + 地面', '华纹系列独立验收'], lastPromptAt: now - 3 * 3600 * 1000, cwd: '/x/dsh-image-zoom', projectName: 'dsh-image-zoom' },
-        { id: 's-dormant', title: '很早以前的皮肤实验', category: 'dormant', reasons: ['还有 1 步没做完'], lastPromptAt: now - 9 * 86400000, cwd: '/x/dsh-skin', projectName: 'dsh-skin' },
+        { id: 's-wait', title: '华纹主题系列包发布前独立验收', category: 'wait', reasons: [{ code: 'waiting' }], lastPromptAt: now - 40 * 60 * 1000, cwd: '/x/huawen', projectName: 'huawen' },
+        { id: 's-idle', title: '图片预览插件开发与发布', category: 'idle', reasons: [{ code: 'todos', count: 2 }, { code: 'team', count: 2 }], teamTasks: ['华纹纹理层：砖瓦 + 地面', '华纹系列独立验收'], lastPromptAt: now - 3 * 3600 * 1000, cwd: '/x/dsh-image-zoom', projectName: 'dsh-image-zoom' },
+        { id: 's-dormant', title: '很早以前的皮肤实验', category: 'dormant', reasons: [{ code: 'todos', count: 1 }], lastPromptAt: now - 9 * 86400000, cwd: '/x/dsh-skin', projectName: 'dsh-skin' },
       ],
     }
     const envelope = (value) => ({ ok: true, value })
@@ -186,6 +186,9 @@
         return undefined
       },
     }
+  </script>
+  <script>
+    if (new URLSearchParams(location.search).get('lang') === 'en') document.documentElement.lang = 'en'
   </script>
   <script src="../client.js"></script>
   <script>
