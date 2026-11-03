@@ -37,9 +37,9 @@ The left sidebar is the entry, not the console; the right panel is the result, n
 
 ## How it works
 
-- **Control in the conversation header**: bind the conversation to a project, mark dev-done, GitHub / npm / DSH Market / your own site (market has `in review`), see local vs published version, and close the conversation.
+- **Control in the conversation header**: bind a project, mark dev-done, GitHub / npm / DSH Market / your own site (market has `in review`), see local vs published version, and close the conversation.
 - **Projects tab**: discovers folders with `package.json` / `.git`, shows version, channels, last commit and uncommitted changes.
-- **In progress**: conversations with unfinished work, one row per conversation; close or ignore.
+- **In progress**: conversations with unfinished work from DSH's own signals, one row per conversation; you can close or ignore them.
 - **Scheduled**: active entries from `schedule.json`, click to jump back to the source conversation.
 - **Sticky-note colours**: red = overdue/urgent, orange = today/waiting/important, yellow = soon, blue = in progress, purple = scheduled, green = todo, grey = dormant/done. Each task row has a hover flag to cycle priority (auto → important → urgent).
 

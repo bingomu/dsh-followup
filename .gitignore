@@ -8,3 +8,6 @@ tests/downloads/
 
 # local-only marketing kit (never publish)
 marketing/
+
+# internal release notes / PR drafts (local only)
+release/
