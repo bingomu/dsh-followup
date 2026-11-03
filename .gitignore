@@ -5,3 +5,6 @@ node_modules/
 tests/.chrome-*/
 tests/shots/
 tests/downloads/
+
+# local-only marketing kit (never publish)
+marketing/

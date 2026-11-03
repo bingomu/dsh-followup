@@ -8,7 +8,7 @@
 >
 > 对话头部是控制区：标记状态、对齐项目、决定收尾；左栏是提示，右侧面板是所有结果的账本。
 
-[English](README.en.md) · [发布物料](https://github.com/bingomu/dsh-followup/tree/main/marketing)
+[English](README.en.md)
 
 
 ## 产品定位

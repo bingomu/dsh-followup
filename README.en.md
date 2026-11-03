@@ -4,7 +4,7 @@
 >
 > The conversation header is the control: mark state, align with the project, decide when it is done. Left is the nudge; the right panel is the ledger.
 
-[中文](README.md) · [Marketing kit](https://github.com/bingomu/dsh-followup/tree/main/marketing)
+[中文](README.md)
 
 
 ## Positioning
