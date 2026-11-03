@@ -4,7 +4,10 @@
 >
 > No settings, no projects, no priorities to configure — just one list.
 
-![Follow-up panel](assets/sheet.png)
+[中文](README.md) · [Marketing kit](https://github.com/bingomu/dsh-followup/tree/main/marketing)
+
+
+![Follow-up panel](assets/sheet-en.png)
 
 ## What it solves
 
@@ -22,9 +25,9 @@
 - **Scheduled**: active entries from `schedule.json`, click to jump back to the source conversation.
 - **Sticky-note colours**: red = overdue/urgent, orange = today/waiting/important, yellow = soon, blue = in progress, purple = scheduled, green = todo, grey = dormant/done. Each task row has a hover flag to cycle priority (auto → important → urgent).
 
-![Header marking](assets/header.png)
+![Header marking](assets/header-en.png)
 
-![Project picker](assets/pick.png)
+![Project picker](assets/pick-en.png)
 
 ## Time parsing
 
@@ -55,15 +58,41 @@ A system-prompt section teaches every agent to record things when the user says 
 
 ## Install
 
-```bash
-# from npm (after the first publish)
-dsh plugin --profile web add @bingomu/dsh-followup
+### From the GitHub release (recommended; no npm needed)
 
-# or directly from GitHub
-dsh plugin --profile web add github:bingomu/dsh-followup
+**Quit the desktop app fully first** (`⌘Q`; closing the window is not enough), then:
+
+```bash
+"/Applications/DeepSeek Harness.app/Contents/Resources/runtime/cli/bin/dsh" \
+  plugin --profile desktop add \
+  "https://github.com/bingomu/dsh-followup/releases/download/v0.2.0/bingomu-dsh-followup-0.2.0.tgz"
 ```
 
-Desktop app: Settings → Plugins. Restart the app once after installing (the host half mounts at boot). The client half reloads with the page.
+Reopen the app.
+
+- For `dsh web`, use `--profile web` instead of `--profile desktop`
+- You can also download `bingomu-dsh-followup-0.2.0.tgz` from the
+  [release page](https://github.com/bingomu/dsh-followup/releases/tag/v0.2.0) and install with `file:/absolute/path`
+- Full walkthrough (finding the CLI, PATH, troubleshooting, uninstall): [docs/install-from-release.md](docs/install-from-release.md)
+
+### From source
+
+```bash
+dsh plugin --profile desktop add github:bingomu/dsh-followup
+```
+
+### npm
+
+Not published yet; once it is, `dsh plugin add @bingomu/dsh-followup` will work.
+Until then, install from the GitHub release tarball.
+
+### Uninstall
+
+```bash
+dsh plugin --profile desktop remove @bingomu/dsh-followup
+```
+
+Data stays in `~/.dsh/followup/`.
 
 Local development uses a link in the profile's `dependencies` + `bundles`, then a restart.
 

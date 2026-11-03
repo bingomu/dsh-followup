@@ -8,6 +8,9 @@
 >
 > 没有设置、没有项目、没有优先级、没有看板——只有一条清单。
 
+[English](README.en.md) · [发布物料](https://github.com/bingomu/dsh-followup/tree/main/marketing)
+
+
 ![面板](assets/sheet.png)
 
 ![对话里一键标记](assets/header.png)
@@ -93,20 +96,38 @@
 
 ## 安装 / 卸载
 
-```bash
-# npm（发布后）
-dsh plugin --profile web add @bingomu/dsh-followup
+### 从 GitHub Release（推荐，不需要 npm）
 
-# 或者直接从 GitHub
-dsh plugin --profile web add github:bingomu/dsh-followup
+**先 ⌘Q 完全退出桌面 App**（点红叉关窗口不算），然后：
+
+```bash
+"/Applications/DeepSeek Harness.app/Contents/Resources/runtime/cli/bin/dsh" \
+  plugin --profile desktop add \
+  "https://github.com/bingomu/dsh-followup/releases/download/v0.2.0/bingomu-dsh-followup-0.2.0.tgz"
 ```
 
-桌面端在「设置 → 插件」里安装。**装完重启一次 App**（宿主半在启动时组装）；客户端改动刷新页面即可。
+重新打开 App。
 
-卸载：
+- 网页版把 `--profile desktop` 换成 `--profile web`
+- 也可以从 [Release 页面](https://github.com/bingomu/dsh-followup/releases/tag/v0.2.0) 下载
+  `bingomu-dsh-followup-0.2.0.tgz`，再用 `file:/绝对路径` 安装
+- 完整步骤（找 CLI、PATH、排错、卸载）：[docs/install-from-release.md](docs/install-from-release.md)
+
+### 从源码
 
 ```bash
-dsh plugin --profile web remove @bingomu/dsh-followup
+dsh plugin --profile desktop add github:bingomu/dsh-followup
+```
+
+### npm
+
+暂未发布；发布后会补 `dsh plugin add @bingomu/dsh-followup`。
+现在市场/README 的安装都走 GitHub Release 的 tarball。
+
+### 卸载
+
+```bash
+dsh plugin --profile desktop remove @bingomu/dsh-followup
 ```
 
 数据保留在 `~/.dsh/followup/`，删目录才会清空。
