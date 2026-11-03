@@ -99,6 +99,12 @@ window.__ModuleLoader__.load({
           reasonRunning: '正在跑',
           manualFirst: '手动标记优先',
           refreshUi: '刷新界面',
+          statusDirty: '有改动',
+          statusAhead: '待迭代',
+          statusReady: '待发布',
+          statusReleased: '已发布',
+          statusPending: '待审核',
+          short: { github: 'GitHub', npm: 'npm', market: '市场', site: '自己的站' },
           localTag: '本地 tag',
           notPushed: '未推送',
           rebind: '换项目',
@@ -187,6 +193,12 @@ window.__ModuleLoader__.load({
           reasonRunning: 'running',
           manualFirst: 'manual marks win',
           refreshUi: 'Reload UI',
+          statusDirty: 'dirty',
+          statusAhead: 'needs iteration',
+          statusReady: 'ready to publish',
+          statusReleased: 'released',
+          statusPending: 'in review',
+          short: { github: 'GitHub', npm: 'npm', market: 'Market', site: 'own site' },
           localTag: 'local tag',
           notPushed: 'not pushed',
           rebind: 'Change',
@@ -505,6 +517,19 @@ window.__ModuleLoader__.load({
         }
       }
       return projectName(task)
+    }
+
+    /** 发布状态码 → 当前语言。 */
+    function statusText(status) {
+      if (status === null || status === undefined) return ''
+      const map = {
+        dirty: T.statusDirty,
+        ahead: T.statusAhead,
+        ready: T.statusReady,
+        released: T.statusReleased,
+        pending: T.statusPending,
+      }
+      return map[status.key] ?? status.label ?? ''
     }
 
     /** 把宿主返回的原因码翻译成当前语言。 */
@@ -1420,8 +1445,11 @@ window.__ModuleLoader__.load({
           : null,
       ))
 
-      const releaseLabelOf = (item) => item?.release?.label
-        ?? (typeof item?.release === 'string' ? item.release : null)
+      const releaseLabelOf = (item) => {
+        const channel = item?.release?.channel
+        if (typeof channel === 'string' && T.short?.[channel]) return T.short[channel]
+        return item?.release?.label ?? (typeof item?.release === 'string' ? item.release : null)
+      }
       const releaseChip = (item) => {
         const label = releaseLabelOf(item)
         return label === null || label === undefined
@@ -1441,7 +1469,7 @@ window.__ModuleLoader__.load({
           React.createElement('span', { className: 'fu-pop-local' },
             `${T.localVersion} ${typeof releases?.local === 'string' && releases.local.length > 0 ? `v${releases.local}` : (typeof project.version === 'string' ? `v${project.version}` : '—')}`),
           status !== null
-            ? React.createElement('span', { className: `fu-status fu-status-${status.key}` }, status.label)
+            ? React.createElement('span', { className: `fu-status fu-status-${status.key}` }, statusText(status))
             : null,
         ))
       }

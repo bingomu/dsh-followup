@@ -1,13 +1,29 @@
 # dsh-followup · Follow-up
 
-> Unfinished things from any conversation are recorded for you, surface on time, and one click takes you back to the conversation where they were born.
+> **A follow-through system for the AI era. Every conversation gets an ending.**
 >
-> No settings, no projects, no priorities to configure — just one list.
+> The conversation header is the control: mark state, align with the project, decide when it is done. Left is the nudge; the right panel is the ledger.
 
 [中文](README.md) · [Marketing kit](https://github.com/bingomu/dsh-followup/tree/main/marketing)
 
 
-![Follow-up panel](assets/sheet-en.png)
+## Positioning
+
+AI multiplies chats, projects and tasks, fragments attention, and leaves things unfinished. This connects the start to the ending, in three layers:
+
+| Layer | Where | What |
+|---|---|---|
+| **Control (core)** | top-right of every conversation | mark dev-done, release channel, version, market review, and whether the conversation is done |
+| **Nudge** | left sidebar “Follow-up” | the entry plus a count of what needs attention |
+| **Ledger** | right panel | every unfinished conversation, task, schedule and project, sorted by state — the result |
+
+One line: **mark in the chat → align with the project → close in the list.**
+
+The left sidebar is the entry, not the console; the right panel is the result, not the main interface. The control surface is the conversation header.
+
+![Conversation header: the control](assets/header-en.png)
+
+![The ledger](assets/sheet-en.png)
 
 ## What it solves
 
@@ -19,13 +35,11 @@
 
 ## How it works
 
-- **One-click marking in the conversation header**: bind the conversation to a project, mark dev-done, mark release channels (GitHub / npm / DSH Market / your own site), mark the market submission as "in review", or close the conversation.
-- **Projects tab**: discovers folders with `package.json` / `.git`, shows version, channels, last commit, uncommitted changes.
+- **Control in the conversation header**: bind the conversation to a project, mark dev-done, GitHub / npm / DSH Market / your own site (market has `in review`), see local vs published version, and close the conversation.
+- **Projects tab**: discovers folders with `package.json` / `.git`, shows version, channels, last commit and uncommitted changes.
 - **In progress**: conversations with unfinished work, one row per conversation; close or ignore.
 - **Scheduled**: active entries from `schedule.json`, click to jump back to the source conversation.
 - **Sticky-note colours**: red = overdue/urgent, orange = today/waiting/important, yellow = soon, blue = in progress, purple = scheduled, green = todo, grey = dormant/done. Each task row has a hover flag to cycle priority (auto → important → urgent).
-
-![Header marking](assets/header-en.png)
 
 ![Project picker](assets/pick-en.png)
 
