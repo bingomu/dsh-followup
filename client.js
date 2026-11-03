@@ -719,6 +719,9 @@ window.__ModuleLoader__.load({
       .fu-pop-end{margin-top:9px;width:100%;padding:6px;border-radius:8px;border:1px solid var(--dsw-alias-border-l3,rgba(0,0,0,.08));
         background:transparent;color:var(--dsw-alias-label-secondary,#6b6f7f);font:inherit;font-size:11.5px;cursor:pointer}
       .fu-pop-end:hover{background:var(--dsw-alias-interactive-bg-hover,rgba(0,0,0,.05))}
+      .fu-pop-reload{margin-top:7px;width:100%;padding:4px;border:0;border-radius:6px;background:transparent;
+        color:var(--dsw-alias-label-tertiary,#8b93a5);font:inherit;font-size:10.5px;cursor:pointer}
+      .fu-pop-reload:hover{background:var(--dsw-alias-interactive-bg-hover,rgba(0,0,0,.05));color:var(--dsw-alias-label-primary,#1f2328)}
       .fu-pick-search{position:sticky;top:0;z-index:1;width:100%;height:30px;margin:2px 0 8px;padding:0 9px;border:1px solid var(--dsw-alias-border-l2,rgba(0,0,0,.12));
         border-radius:7px;background:var(--dsw-alias-bg-layer-1,#fff);color:var(--dsw-alias-label-primary,#1f2328);font:inherit;font-size:12px;outline:none;box-sizing:border-box}
       .fu-pick-search:focus{border-color:var(--dsw-alias-interactive-bg-hover-accent,#4d6bfe)}
@@ -1553,6 +1556,13 @@ window.__ModuleLoader__.load({
           }, T.reopenSession))
         }
       }
+
+      children.push(React.createElement('button', {
+        type: 'button',
+        className: 'fu-pop-reload',
+        key: 'reload',
+        onClick: () => window.location.reload(),
+      }, `↻ ${T.refreshUi}`))
 
       return React.createElement('div', {
         className: 'fu-pop',
