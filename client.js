@@ -98,6 +98,8 @@ window.__ModuleLoader__.load({
           reasonTeam: (n) => `团队还有 ${n} 个任务`,
           reasonRunning: '正在跑',
           manualFirst: '手动标记优先',
+          localTag: '本地 tag',
+          notPushed: '未推送',
           rebind: '换项目',
           noProject: '这个对话还没绑定项目',
           endSession: '这个对话收尾了',
@@ -183,6 +185,8 @@ window.__ModuleLoader__.load({
           reasonTeam: (n) => `${n} team tasks left`,
           reasonRunning: 'running',
           manualFirst: 'manual marks win',
+          localTag: 'local tag',
+          notPushed: 'not pushed',
           rebind: 'Change',
           noProject: 'This conversation is not bound to a project',
           endSession: 'This conversation is done',
@@ -1367,7 +1371,10 @@ window.__ModuleLoader__.load({
       const manual = project?.mark?.channels ?? {}
       const has = (key) => Object.prototype.hasOwnProperty.call(manual, key)
       const bits = []
-      if (!has('github') && typeof facts.tag === 'string' && facts.tag.length > 0) bits.push(`tag ${facts.tag}`)
+      if (!has('github') && typeof facts.tag === 'string' && facts.tag.length > 0) {
+        if (typeof facts.remote === 'string' && facts.remote.length > 0) bits.push(`tag ${facts.tag}`)
+        else bits.push(zh ? `${T.localTag} ${facts.tag}（${T.notPushed}）` : `${T.localTag} ${facts.tag} (${T.notPushed})`)
+      }
       if (!has('npm')) {
         if (facts.npm === 'none') bits.push(zh ? 'npm 未发' : 'npm none')
         else if (typeof facts.npm === 'string' && facts.npm.length > 0) bits.push(`npm ${facts.npm}`)
