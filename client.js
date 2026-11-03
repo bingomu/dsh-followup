@@ -98,6 +98,7 @@ window.__ModuleLoader__.load({
           reasonTeam: (n) => `团队还有 ${n} 个任务`,
           reasonRunning: '正在跑',
           manualFirst: '手动标记优先',
+          refreshUi: '刷新界面',
           localTag: '本地 tag',
           notPushed: '未推送',
           rebind: '换项目',
@@ -185,6 +186,7 @@ window.__ModuleLoader__.load({
           reasonTeam: (n) => `${n} team tasks left`,
           reasonRunning: 'running',
           manualFirst: 'manual marks win',
+          refreshUi: 'Reload UI',
           localTag: 'local tag',
           notPushed: 'not pushed',
           rebind: 'Change',
@@ -586,6 +588,9 @@ window.__ModuleLoader__.load({
       .fu-head-main{flex:1;min-width:0}
       .fu-title{font-size:15px;font-weight:650;color:var(--dsw-alias-label-primary,#1f2328);letter-spacing:.01em}
       .fu-sub{margin-top:3px;font-size:11.5px;color:var(--dsw-alias-label-tertiary,#8b93a5)}
+      .fu-refresh{flex:none;width:26px;height:26px;border:0;border-radius:7px;background:transparent;color:var(--dsw-alias-label-tertiary,#8b93a5);
+        font-size:15px;line-height:1;cursor:pointer}
+      .fu-refresh:hover{background:var(--dsw-alias-interactive-bg-hover,rgba(0,0,0,.05));color:var(--dsw-alias-label-primary,#1f2328)}
       .fu-close{flex:none;width:26px;height:26px;border:0;border-radius:7px;background:transparent;color:var(--dsw-alias-label-tertiary,#8b93a5);
         font-size:16px;line-height:1;cursor:pointer}
       .fu-close:hover{background:var(--dsw-alias-interactive-bg-hover,rgba(0,0,0,.05));color:var(--dsw-alias-label-primary,#1f2328)}
@@ -776,6 +781,7 @@ window.__ModuleLoader__.load({
               <div class="fu-title">${T.title}</div>
               <div class="fu-sub" data-el="sub"></div>
             </div>
+            <button class="fu-refresh" data-act="refresh" title="${T.refreshUi}" aria-label="${T.refreshUi}">↻</button>
             <button class="fu-close" data-act="close" title="${T.close}" aria-label="${T.close}">×</button>
           </header>
           <div class="fu-tabs" data-el="tabs">
@@ -806,6 +812,9 @@ window.__ModuleLoader__.load({
 
       els.backdrop.addEventListener('click', closeSheet)
       els.close.addEventListener('click', closeSheet)
+      root.querySelector('[data-act="refresh"]').addEventListener('click', () => {
+        window.location.reload()
+      })
       els.tabs.addEventListener('click', (event) => {
         const tab = event.target.closest?.('[data-tab]')?.getAttribute('data-tab')
         if (tab !== null && tab !== undefined) setTab(tab)
