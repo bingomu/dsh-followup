@@ -19,6 +19,8 @@ AI multiplies chats, projects and tasks, fragments attention, and leaves things 
 
 One line: **mark in the chat → align with the project → close in the list.**
 
+**All three points together are the product.**
+
 The left sidebar is the entry, not the console; the right panel is the result, not the main interface. The control surface is the conversation header.
 
 ![Conversation header: the control](assets/header-en.png)

@@ -70,6 +70,7 @@
     const now = Date.now()
     const DAY = 86400000
     const FORCE_PICK = new URLSearchParams(location.search).get('mode') === 'pick'
+    const EN = new URLSearchParams(location.search).get('lang') === 'en'
     const project = {
       path: '/Users/robinham/Documents/deepseek-harness/default-workspace/readable-diagrams',
       name: 'readable-diagrams', dir: 'readable-diagrams', version: '1.1.0', lastActive: now - 2 * DAY,
@@ -113,6 +114,28 @@
         { id: 's-dormant', title: '很早以前的皮肤实验', category: 'dormant', reasons: [{ code: 'todos', count: 1 }], lastPromptAt: now - 9 * 86400000, cwd: '/x/dsh-skin', projectName: 'dsh-skin' },
       ],
     }
+    if (EN) {
+      const taskTitles = {
+        'f-1': 'Verify dsh-followup on desktop: sidebar entry, panel, jump back',
+        'f-2': 'Finish the dsh-followup README and install notes',
+        'f-3': 'Publish dsh-followup to the DSH Market',
+        'f-4': 'Settle the global task-layer plan',
+      }
+      for (const task of store.tasks) task.title = taskTitles[task.id] ?? task.title
+      const sessionCopy = {
+        's-wait': { title: 'Huawen theme series: pre-release review' },
+        's-idle': { title: 'Image-preview plugin: build and release', team: ['Huawen texture layer: brick + floor', 'Huawen series independent review'] },
+        's-dormant': { title: 'An old skin experiment' },
+      }
+      for (const session of store.sessions) {
+        const copy = sessionCopy[session.id]
+        if (copy) {
+          session.title = copy.title
+          if (copy.team) session.teamTasks = copy.team
+        }
+      }
+    }
+
     const envelope = (value) => ({ ok: true, value })
     const respond = (value) => Promise.resolve({
       ok: true, status: 200,
@@ -124,12 +147,15 @@
       if (path.endsWith('/followup/list')) return respond({ tasks: store.tasks })
       if (path.endsWith('/followup/sessions')) return respond({ sessions: store.sessions })
       if (path.endsWith('/followup/projects')) return respond({ projects: [project, project2] })
-      if (path.endsWith('/followup/schedules')) return respond({ schedules: [
+      if (path.endsWith('/followup/schedules')) return respond({ schedules: EN ? [
+        { id: 'sc1', title: 'Check DSH Market listing status', at: now + 3 * 3600 * 1000, sessionId: 's-idle', sessionTitle: 'Image-preview plugin: build and release' },
+        { id: 'sc2', title: 'Submit the dsh-image-zoom listing PR', at: now + 26 * 3600 * 1000, sessionId: 's-idle', sessionTitle: 'Image-preview plugin: build and release' },
+      ] : [
         { id: 'sc1', title: '检查 DSH 市场收录状态', at: now + 3 * 3600 * 1000, sessionId: 's-idle', sessionTitle: '图片预览插件开发与发布' },
         { id: 'sc2', title: '提交 dsh-image-zoom 收录 PR', at: now + 26 * 3600 * 1000, sessionId: 's-idle', sessionTitle: '图片预览插件开发与发布' },
       ] })
       if (path.endsWith('/followup/session')) return respond({
-        session: { id: 's1', title: 'readable-diagrams 发布准备', cwd: project.path, endedAt: null },
+        session: { id: 's1', title: EN ? 'readable-diagrams release prep' : 'readable-diagrams 发布准备', cwd: project.path, endedAt: null },
         project: FORCE_PICK ? null : project,
         via: FORCE_PICK ? null : 'title',
         guess: (() => { const { lastActive, ...rest } = project; return rest })(),
@@ -164,6 +190,19 @@
       return Promise.reject(new Error('unexpected ' + path))
     }
 
+    if (EN) {
+      const fakeSessions = [...document.querySelectorAll('.fake-session')]
+      const sessionLabels = ['readable-diagrams release prep', 'dsh-image-zoom dev', 'Huawen theme series']
+      fakeSessions.forEach((el, i) => { if (sessionLabels[i]) el.textContent = sessionLabels[i] })
+      const mockHeading = document.querySelector('.fake-body h1')
+      if (mockHeading) mockHeading.textContent = 'Conversation (mock)'
+      const fakeTitle = document.querySelector('.fake-title')
+      if (fakeTitle) fakeTitle.textContent = 'Conversation · readable-diagrams release prep'
+      const bubbles = [...document.querySelectorAll('.fake-bubble')]
+      if (bubbles[0]) bubbles[0].textContent = 'Host half is wired up: tasks, sessions and projects all respond.'
+      if (bubbles[1]) bubbles[1].textContent = 'Now the browser half: in progress, projects tab, header marking.'
+    }
+
     window.__ModuleLoader__ = { load(options) { window.__FU_MODULE__ = options } }
     window.__FU_SLOTS__ = {}
     const ctx = {
@@ -178,9 +217,9 @@
       get(name) {
         if (name === 'sessions') {
           return { list: { getSnapshot: () => ({ byId: {
-            s1: { displayTitle: 'readable-diagrams 发布准备' },
-            's-wait': { displayTitle: '华纹主题系列包发布前独立验收' },
-            's-idle': { displayTitle: '图片预览插件开发与发布' },
+            s1: { displayTitle: EN ? 'readable-diagrams release prep' : 'readable-diagrams 发布准备' },
+            's-wait': { displayTitle: EN ? 'Huawen theme series: pre-release review' : '华纹主题系列包发布前独立验收' },
+            's-idle': { displayTitle: EN ? 'Image-preview plugin: build and release' : '图片预览插件开发与发布' },
           } }) } }
         }
         return undefined

@@ -1,7 +1,7 @@
 {
   "name": "@bingomu/dsh-followup",
   "version": "0.2.0",
-  "description": "全局跟进：聊天里没做完的事自动记下来，到点自己浮出来，一键回到原对话。没有设置、没有项目、没有状态，只有一条清单。",
+  "description": "A follow-through system for DSH: sidebar nudge, conversation-header control, ledger panel. 对话收尾系统：让每个对话都有始有终。",
   "type": "module",
   "main": "index.js",
   "license": "MIT",
