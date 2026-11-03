@@ -10,6 +10,8 @@
 
 [English](README.en.md)
 
+![dsh-followup 有始有终](https://raw.githubusercontent.com/bingomu/dsh-followup/main/assets/hero-zh-1200x630.png)
+
 
 ## 产品定位
 
