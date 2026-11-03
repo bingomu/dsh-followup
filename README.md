@@ -1,6 +1,6 @@
 # dsh-followup · 跟进
 
-[![npm](https://img.shields.io/npm/v/@bingomu/dsh-followup.svg)](https://www.npmjs.com/package/@bingomu/dsh-followup)
+![version](https://img.shields.io/badge/version-0.2.0-4d6bfe)
 [![license](https://img.shields.io/npm/l/@bingomu/dsh-followup.svg)](LICENSE)
 [![DSH](https://img.shields.io/badge/DSH-0.2.1--rc.2%2B-4d6bfe)](https://github.com/bingomu/dsh-followup)
 
