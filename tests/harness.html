@@ -58,9 +58,9 @@
       <span class="fake-title">对话 · readable-diagrams 发布准备</span>
     </div>
     <div class="fake-body">
-      <h1>对话区（模拟）</h1>
-      <div class="fake-bubble">宿主半已经跑通：任务、会话、项目三类接口都正常。</div>
-      <div class="fake-bubble">现在验证浏览器半：进行中、项目页签、header 一键标记。</div>
+      <h1>这版发布前</h1>
+      <div class="fake-bubble">这版发布前把 README 和安装记录补一下。</div>
+      <div class="fake-bubble">好，我记在跟进里了，发布后回来收尾。</div>
     </div>
   </main>
 
@@ -195,12 +195,12 @@
       const sessionLabels = ['readable-diagrams release prep', 'dsh-image-zoom dev', 'Huawen theme series']
       fakeSessions.forEach((el, i) => { if (sessionLabels[i]) el.textContent = sessionLabels[i] })
       const mockHeading = document.querySelector('.fake-body h1')
-      if (mockHeading) mockHeading.textContent = 'Conversation (mock)'
+      if (mockHeading) mockHeading.textContent = 'Before this release'
       const fakeTitle = document.querySelector('.fake-title')
       if (fakeTitle) fakeTitle.textContent = 'Conversation · readable-diagrams release prep'
       const bubbles = [...document.querySelectorAll('.fake-bubble')]
-      if (bubbles[0]) bubbles[0].textContent = 'Host half is wired up: tasks, sessions and projects all respond.'
-      if (bubbles[1]) bubbles[1].textContent = 'Now the browser half: in progress, projects tab, header marking.'
+      if (bubbles[0]) bubbles[0].textContent = 'Finish the README and install notes before this release.'
+      if (bubbles[1]) bubbles[1].textContent = 'Noted in Follow-up — we will close it after the release.'
     }
 
     window.__ModuleLoader__ = { load(options) { window.__FU_MODULE__ = options } }
