@@ -1,0 +1,74 @@
+{
+  "name": "@bingomu/dsh-followup",
+  "version": "0.2.0",
+  "description": "全局跟进：聊天里没做完的事自动记下来，到点自己浮出来，一键回到原对话。没有设置、没有项目、没有状态，只有一条清单。",
+  "type": "module",
+  "main": "index.js",
+  "license": "MIT",
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "deepseek-harness",
+    "follow-up",
+    "task",
+    "reminder",
+    "kanban",
+    "sticky-notes"
+  ],
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./icon": "./icon.svg",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "index.js",
+    "client.js",
+    "lib",
+    "cordis.patch.yml",
+    "icon.svg",
+    "assets",
+    "README.md",
+    "README.en.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true
+    },
+    "compatibility": {
+      "dshReleases": {
+        "0.2.0-rc.2": "compatible"
+      }
+    }
+  },
+  "engines": {
+    "node": ">=22",
+    "dsh": ">=0.2.1-rc.2 <0.3.0-0"
+  },
+  "scripts": {
+    "check": "node --check index.js && node --check client.js && node --check lib/store.js && node --check lib/dates.js && node --check lib/routes.js && node --check lib/tools.js && node --check lib/projects.js && node --check lib/sessions.js && node --check lib/schedules.js",
+    "test": "node tests/run.mjs"
+  },
+  "author": {
+    "name": "Genzo",
+    "email": "robinham@gmail.com",
+    "url": "https://x.com/robinham"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "homepage": "https://github.com/bingomu/dsh-followup#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bingomu/dsh-followup.git"
+  },
+  "bugs": {
+    "url": "https://github.com/bingomu/dsh-followup/issues"
+  }
+}

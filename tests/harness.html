@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <title>dsh-followup · UI harness</title>
+  <style>
+    :root {
+      --dsw-alias-bg-layer-1: #ffffff;
+      --dsw-alias-bg-layer-2: #f2f3f5;
+      --dsw-alias-label-primary: #1f2328;
+      --dsw-alias-label-secondary: #6b6f7f;
+      --dsw-alias-label-tertiary: #8b93a5;
+      --dsw-alias-border-l2: #d0d4dd;
+      --dsw-alias-border-l3: rgba(0, 0, 0, .08);
+      --dsw-alias-interactive-bg-hover: rgba(0, 0, 0, .05);
+      --dsw-alias-interactive-bg-hover-accent: #4d6bfe;
+      --dsw-shadow-lv3: -24px 0 48px rgba(0, 0, 0, .18);
+    }
+    html, body { margin: 0; height: 100%; }
+    body {
+      font: 13px/1.5 -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
+      color: var(--dsw-alias-label-primary);
+      background: #f7f7f8;
+      display: flex;
+    }
+    .fake-sidebar {
+      width: 240px; flex: none; display: flex; flex-direction: column;
+      background: #fbfbfc; border-right: 1px solid var(--dsw-alias-border-l3); padding: 10px 8px;
+    }
+    .fake-brand { font-weight: 600; font-size: 13px; padding: 6px 6px 10px; }
+    .fake-crumbs { display: flex; gap: 6px; padding: 0 6px 12px; }
+    .fake-crumb { font-size: 11px; color: var(--dsw-alias-label-tertiary); }
+    .fake-sessions { flex: 1; }
+    .fake-session { padding: 5px 7px; border-radius: 7px; color: var(--dsw-alias-label-secondary); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .fake-session.active { background: rgba(0, 0, 0, .05); color: var(--dsw-alias-label-primary); }
+    .fake-foot { border-top: 1px solid var(--dsw-alias-border-l3); padding-top: 8px; }
+    .fake-main { flex: 1; padding: 0; color: var(--dsw-alias-label-secondary); display: flex; flex-direction: column; }
+    .fake-header { height: 48px; display: flex; align-items: center; justify-content: flex-end; gap: 8px; padding: 0 18px; border-bottom: 1px solid var(--dsw-alias-border-l3); }
+    .fake-header .fake-title { margin-right: auto; font-size: 12.5px; color: var(--dsw-alias-label-tertiary); }
+    .fake-body { padding: 28px 36px; }
+    .fake-body h1 { font-size: 15px; color: var(--dsw-alias-label-primary); margin: 0 0 8px; }
+    .fake-bubble { max-width: 460px; padding: 10px 14px; border-radius: 12px; background: #fff; border: 1px solid var(--dsw-alias-border-l3); margin-bottom: 10px; }
+  </style>
+</head>
+<body>
+  <aside class="fake-sidebar">
+    <div class="fake-brand">DeepSeek Harness</div>
+    <div class="fake-crumbs"><span class="fake-crumb">default-workspace</span><span class="fake-crumb">/</span><span class="fake-crumb">readable-diagrams</span></div>
+    <div class="fake-sessions">
+      <div class="fake-session active">readable-diagrams 发布准备</div>
+      <div class="fake-session">dsh-image-zoom 开发</div>
+      <div class="fake-session">华纹主题系列</div>
+    </div>
+    <div class="fake-foot" id="footer-slot"></div>
+  </aside>
+  <main class="fake-main">
+    <div class="fake-header" id="header-slot">
+      <span class="fake-title">对话 · readable-diagrams 发布准备</span>
+    </div>
+    <div class="fake-body">
+      <h1>对话区（模拟）</h1>
+      <div class="fake-bubble">宿主半已经跑通：任务、会话、项目三类接口都正常。</div>
+      <div class="fake-bubble">现在验证浏览器半：进行中、项目页签、header 一键标记。</div>
+    </div>
+  </main>
+
+  <script src="vendor/react.js"></script>
+  <script src="vendor/react-dom.js"></script>
+  <script>
+    const now = Date.now()
+    const DAY = 86400000
+    const FORCE_PICK = new URLSearchParams(location.search).get('mode') === 'pick'
+    const project = {
+      path: '/Users/robinham/Documents/deepseek-harness/default-workspace/readable-diagrams',
+      name: 'readable-diagrams', dir: 'readable-diagrams', version: '1.1.0', lastActive: now - 2 * DAY,
+      repo: 'git+https://github.com/bingomu/readable-diagrams.git',
+      homepage: 'https://github.com/bingomu/readable-diagrams#readme',
+      private: false,
+      channel: { devDone: true, github: true, npm: false, market: false, site: true },
+      mark: { devDone: true, channels: { github: true, site: true } },
+      releases: { local: '1.1.0', channels: {
+        github: { state: 'on', version: '1.1.0' },
+        npm: { state: 'off', version: null },
+        market: { state: 'pending', version: null },
+        site: { state: 'on', version: '1.1.0' },
+      }, status: { key: 'released', label: '已发布' } },
+      versionKey: '1.1.0',
+      facts: { tag: 'v1.1.0', lastCommit: new Date(now - 2 * DAY).toISOString(), dirty: false, remote: 'https://github.com/bingomu/readable-diagrams.git', npm: 'none', market: false, claude: true, codex: true },
+    }
+    const project2 = {
+      path: '/Users/robinham/Documents/deepseek-harness/default-workspace/dsh-image-zoom',
+      name: 'dsh-image-zoom', dir: 'dsh-image-zoom', version: '1.0.1', lastActive: now - 5 * DAY,
+      channel: { devDone: true, github: true, npm: false, market: true, site: false },
+      facts: { tag: 'v1.0.1', lastCommit: new Date(now - 5 * DAY).toISOString(), dirty: true, npm: '1.0.1', market: true },
+      releases: { local: '1.0.1', channels: {
+        github: { state: 'on', version: '1.0.1' },
+        npm: { state: 'on', version: '1.0.1' },
+        market: { state: 'on', version: null },
+        site: { state: 'off', version: null },
+      }, status: { key: 'released', label: '已发布' } },
+      mark: {}, versionKey: '1.0.1',
+    }
+    const store = {
+      tasks: [
+        { id: 'f-1', title: '确认 dsh-followup 在桌面端跑通：左栏入口、面板、跳回原对话', done: false, priority: 2, dueAt: now - 2 * 3600 * 1000, createdAt: now - DAY, updatedAt: now - 3 * 3600 * 1000, source: { sessionId: 's1', cwd: '/x/dsh-followup' } },
+        { id: 'f-2', title: '补 dsh-followup 的 README 和安装记录', done: false, priority: 1, createdAt: now - 2 * DAY, updatedAt: now - 2 * DAY, source: { sessionId: 's1', cwd: '/x/dsh-followup' } },
+        { id: 'f-3', title: '把 dsh-followup 发到 DSH 市场', done: false, dueAt: now + 26 * 3600 * 1000, createdAt: now - 3600 * 1000, updatedAt: now - 3600 * 1000, source: { sessionId: 's1', cwd: '/x/dsh-followup' } },
+        { id: 'f-4', title: '把全局任务层的方案定下来', done: true, doneAt: now - DAY, createdAt: now - 3 * DAY, updatedAt: now - DAY, source: { sessionId: 's1', cwd: '/x' } },
+      ],
+      sessions: [
+        { id: 's-wait', title: '华纹主题系列包发布前独立验收', category: 'wait', reasons: ['等你回答'], lastPromptAt: now - 40 * 60 * 1000, cwd: '/x/huawen', projectName: 'huawen' },
+        { id: 's-idle', title: '图片预览插件开发与发布', category: 'idle', reasons: ['还有 2 步没做完', '团队还有 2 个任务'], teamTasks: ['华纹纹理层：砖瓦 + 地面', '华纹系列独立验收'], lastPromptAt: now - 3 * 3600 * 1000, cwd: '/x/dsh-image-zoom', projectName: 'dsh-image-zoom' },
+        { id: 's-dormant', title: '很早以前的皮肤实验', category: 'dormant', reasons: ['还有 1 步没做完'], lastPromptAt: now - 9 * 86400000, cwd: '/x/dsh-skin', projectName: 'dsh-skin' },
+      ],
+    }
+    const envelope = (value) => ({ ok: true, value })
+    const respond = (value) => Promise.resolve({
+      ok: true, status: 200,
+      text: async () => JSON.stringify(envelope(value)),
+      headers: { get: () => 'application/json' },
+    })
+    window.fetch = async (url, init) => {
+      const path = String(url).split('?')[0]
+      if (path.endsWith('/followup/list')) return respond({ tasks: store.tasks })
+      if (path.endsWith('/followup/sessions')) return respond({ sessions: store.sessions })
+      if (path.endsWith('/followup/projects')) return respond({ projects: [project, project2] })
+      if (path.endsWith('/followup/schedules')) return respond({ schedules: [
+        { id: 'sc1', title: '检查 DSH 市场收录状态', at: now + 3 * 3600 * 1000, sessionId: 's-idle', sessionTitle: '图片预览插件开发与发布' },
+        { id: 'sc2', title: '提交 dsh-image-zoom 收录 PR', at: now + 26 * 3600 * 1000, sessionId: 's-idle', sessionTitle: '图片预览插件开发与发布' },
+      ] })
+      if (path.endsWith('/followup/session')) return respond({
+        session: { id: 's1', title: 'readable-diagrams 发布准备', cwd: project.path, endedAt: null },
+        project: FORCE_PICK ? null : project,
+        via: FORCE_PICK ? null : 'title',
+        guess: (() => { const { lastActive, ...rest } = project; return rest })(),
+        candidates: [project, project2].map((p, index) => {
+          const { lastActive, ...rest } = p
+          return { ...rest, match: index === 0 ? 4 : 2 }
+        }),
+      })
+      if (path.endsWith('/followup/add')) {
+        const body = JSON.parse(init.body)
+        const task = { id: 'f-new', title: body.title, done: false, createdAt: Date.now(), updatedAt: Date.now(), source: { sessionId: 's1', cwd: '/x' } }
+        store.tasks.push(task)
+        return respond({ task })
+      }
+      if (path.endsWith('/followup/update')) {
+        const body = JSON.parse(init.body)
+        const task = store.tasks.find((item) => item.id === body.id)
+        if (body.done !== undefined) { task.done = body.done; task.doneAt = Date.now() }
+        task.updatedAt = Date.now()
+        return respond({ task })
+      }
+      if (path.endsWith('/followup/mark')) {
+        const body = JSON.parse(init.body)
+        const target = body.path === project.path ? project : project2
+        if (body.devDone !== undefined) { target.channel.devDone = body.devDone === true; target.mark.devDone = body.devDone === true }
+        if (body.channel !== undefined) { target.channel[body.channel] = body.value === true; target.mark.channels = target.mark.channels || {}; target.mark.channels[body.channel] = body.value === true }
+        return respond({ project: target })
+      }
+      if (path.endsWith('/followup/bind')) return respond({ project })
+      if (path.endsWith('/followup/session/ignore')) return respond({ session: { ignoredPromptAt: Date.now() } })
+      if (path.endsWith('/followup/end-session')) return respond({ session: { endedAt: Date.now() } })
+      return Promise.reject(new Error('unexpected ' + path))
+    }
+
+    window.__ModuleLoader__ = { load(options) { window.__FU_MODULE__ = options } }
+    window.__FU_SLOTS__ = {}
+    const ctx = {
+      slots: {
+        inject(_name, callback) { return callback() },
+        register(options, component) {
+          window.__FU_SLOTS__[options.name] = { options, component }
+          return () => {}
+        },
+      },
+      effect(fn) { fn() },
+      get(name) {
+        if (name === 'sessions') {
+          return { list: { getSnapshot: () => ({ byId: {
+            s1: { displayTitle: 'readable-diagrams 发布准备' },
+            's-wait': { displayTitle: '华纹主题系列包发布前独立验收' },
+            's-idle': { displayTitle: '图片预览插件开发与发布' },
+          } }) } }
+        }
+        return undefined
+      },
+    }
+  </script>
+  <script src="../client.js"></script>
+  <script>
+    const module = window.__FU_MODULE__.factory((name) => {
+      if (name === 'react') return window.React
+      if (name === 'react-dom') return window.ReactDOM
+      throw new Error('unknown module ' + name)
+    })
+    module.apply(ctx)
+
+    const footer = window.__FU_SLOTS__['sidebar.footer.action']
+    const header = window.__FU_SLOTS__['conversation.session.header.utilities']
+    if (!footer) throw new Error('footer entry not registered')
+    if (!header) throw new Error('header mark not registered')
+
+    ReactDOM.createRoot(document.getElementById('footer-slot')).render(
+      React.createElement(footer.component, { wide: true }),
+    )
+    ReactDOM.createRoot(document.getElementById('header-slot')).render(
+      React.createElement(header.component, { sessionId: 's1' }),
+    )
+
+    const mode = new URLSearchParams(location.search).get('mode') ?? 'sheet'
+    setTimeout(() => {
+      if (mode === 'header' || mode === 'pick') {
+        document.querySelector('.fu-hbadge').click()
+        setTimeout(() => { window.__FU_READY__ = true }, 700)
+        return
+      }
+      document.querySelector('.fu-entry').click()
+      if (mode === 'projects') {
+        setTimeout(() => {
+          document.querySelector('[data-tab="projects"]').click()
+          setTimeout(() => { window.__FU_READY__ = true }, 700)
+        }, 500)
+        return
+      }
+      setTimeout(() => { window.__FU_READY__ = true }, 700)
+    }, 500)
+  </script>
+</body>
+</html>

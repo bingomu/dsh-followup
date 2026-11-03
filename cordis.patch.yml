@@ -1,0 +1,6 @@
+# dsh-followup bundle patch：把插件行插进 web profile 的组合树。
+# 宿主半（exports "."）在 host 进程里跑：存储、三个工具、/followup 路由、系统提示段；
+# package.json 里的 dsh.client 让浏览器半（exports "./client"）在 GUI 里加载。
+- insert:
+    - id: dsh-followup
+      name: '@bingomu/dsh-followup'
