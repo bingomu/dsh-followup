@@ -32,7 +32,8 @@
     "README.en.md",
     "LICENSE",
     "CHANGELOG.md",
-    "docs"
+    "docs",
+    "SPONSORS.md"
   ],
   "dsh": {
     "bundle": {
@@ -71,5 +72,9 @@
   },
   "bugs": {
     "url": "https://github.com/bingomu/dsh-followup/issues"
+  },
+  "funding": {
+    "type": "individual",
+    "url": "https://ifdian.net/a/genzo99"
   }
 }

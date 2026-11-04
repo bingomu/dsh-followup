@@ -127,6 +127,13 @@ node tests/run.mjs   # dates, store, tools, routes, projects, sessions, schedule
 - Project discovery scans the workspace root and its direct children.
 - Automatic release detection uses local git tags, the npm registry and the DSH Marketplace page; uncommitted local changes are shown separately.
 
+## Support this project
+
+If it saved you time, you can buy me a coffee. Sponsorship does not unlock features and there is no paywall.
+
+- Afdian: https://ifdian.net/a/genzo99
+- Sponsors: [SPONSORS.md](SPONSORS.md)
+
 ## License
 
 MIT
