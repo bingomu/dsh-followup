@@ -6,7 +6,7 @@
 
 [中文](README.md)
 
-![dsh-followup follow-through](https://raw.githubusercontent.com/bingomu/dsh-followup/main/assets/hero-en-1200x630.png)
+![dsh-followup follow-through](https://raw.githubusercontent.com/bingomu/dsh-followup/main/assets/hero-en-1200x630.png?v=021)
 
 
 ## Positioning
@@ -83,14 +83,14 @@ A system-prompt section teaches every agent to record things when the user says 
 ```bash
 "/Applications/DeepSeek Harness.app/Contents/Resources/runtime/cli/bin/dsh" \
   plugin --profile desktop add \
-  "https://github.com/bingomu/dsh-followup/releases/download/v0.2.0/bingomu-dsh-followup-0.2.0.tgz"
+  "https://github.com/bingomu/dsh-followup/releases/download/v0.2.1/bingomu-dsh-followup-0.2.1.tgz"
 ```
 
 Reopen the app.
 
 - For `dsh web`, use `--profile web` instead of `--profile desktop`
-- You can also download `bingomu-dsh-followup-0.2.0.tgz` from the
-  [release page](https://github.com/bingomu/dsh-followup/releases/tag/v0.2.0) and install with `file:/absolute/path`
+- You can also download `bingomu-dsh-followup-0.2.1.tgz` from the
+  [release page](https://github.com/bingomu/dsh-followup/releases/tag/v0.2.1) and install with `file:/absolute/path`
 - Full walkthrough (finding the CLI, PATH, troubleshooting, uninstall): [docs/install-from-release.md](docs/install-from-release.md)
 
 ### From source

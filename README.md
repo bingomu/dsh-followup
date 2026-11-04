@@ -1,6 +1,6 @@
 # dsh-followup · 跟进
 
-![version](https://img.shields.io/badge/version-0.2.0-4d6bfe)
+![version](https://img.shields.io/badge/version-0.2.1-4d6bfe)
 [![license](https://img.shields.io/npm/l/@bingomu/dsh-followup.svg)](LICENSE)
 [![DSH](https://img.shields.io/badge/DSH-0.2.1--rc.2%2B-4d6bfe)](https://github.com/bingomu/dsh-followup)
 
@@ -10,7 +10,7 @@
 
 [English](README.en.md)
 
-![dsh-followup 有始有终](https://raw.githubusercontent.com/bingomu/dsh-followup/main/assets/hero-zh-1200x630.png)
+![dsh-followup 有始有终](https://raw.githubusercontent.com/bingomu/dsh-followup/main/assets/hero-zh-1200x630.png?v=021)
 
 
 ## 产品定位
@@ -125,14 +125,14 @@ AI 让对话、项目、任务的数量爆炸，人的注意力被切碎——�
 ```bash
 "/Applications/DeepSeek Harness.app/Contents/Resources/runtime/cli/bin/dsh" \
   plugin --profile desktop add \
-  "https://github.com/bingomu/dsh-followup/releases/download/v0.2.0/bingomu-dsh-followup-0.2.0.tgz"
+  "https://github.com/bingomu/dsh-followup/releases/download/v0.2.1/bingomu-dsh-followup-0.2.1.tgz"
 ```
 
 重新打开 App。
 
 - 网页版把 `--profile desktop` 换成 `--profile web`
-- 也可以从 [Release 页面](https://github.com/bingomu/dsh-followup/releases/tag/v0.2.0) 下载
-  `bingomu-dsh-followup-0.2.0.tgz`，再用 `file:/绝对路径` 安装
+- 也可以从 [Release 页面](https://github.com/bingomu/dsh-followup/releases/tag/v0.2.1) 下载
+  `bingomu-dsh-followup-0.2.1.tgz`，再用 `file:/绝对路径` 安装
 - 完整步骤（找 CLI、PATH、排错、卸载）：[docs/install-from-release.md](docs/install-from-release.md)
 
 ### 从源码

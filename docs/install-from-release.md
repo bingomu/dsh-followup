@@ -18,19 +18,19 @@
 
 浏览器打开：
 
-https://github.com/bingomu/dsh-followup/releases/tag/v0.2.0
+https://github.com/bingomu/dsh-followup/releases/tag/v0.2.1
 
 下载 **Assets** 里的：
 
 ```
-bingomu-dsh-followup-0.2.0.tgz
+bingomu-dsh-followup-0.2.1.tgz
 ```
 
 或者终端：
 
 ```bash
 cd ~/Downloads
-curl -L -O https://github.com/bingomu/dsh-followup/releases/download/v0.2.0/bingomu-dsh-followup-0.2.0.tgz
+curl -L -O https://github.com/bingomu/dsh-followup/releases/download/v0.2.1/bingomu-dsh-followup-0.2.1.tgz
 ```
 
 ### 2. 找到 dsh 命令
@@ -55,14 +55,14 @@ alias dsh='"/Applications/DeepSeek Harness.app/Contents/Resources/runtime/cli/bi
 ```bash
 "/Applications/DeepSeek Harness.app/Contents/Resources/runtime/cli/bin/dsh" \
   plugin --profile desktop add \
-  "file:$HOME/Downloads/bingomu-dsh-followup-0.2.0.tgz"
+  "file:$HOME/Downloads/bingomu-dsh-followup-0.2.1.tgz"
 ```
 
 看到类似输出就成功了：
 
 ```
 dependencies:
-+ @bingomu/dsh-followup 0.2.0
++ @bingomu/dsh-followup 0.2.1
 ```
 
 CLI 会自动把它加进 `dsh.profile.bundles`，不需要再手工改 `package.json`。
@@ -74,7 +74,7 @@ CLI 会自动把它加进 `dsh.profile.bundles`，不需要再手工改 `package
 ### 5. 验证
 
 - 左栏底部出现 **「跟进」**（带数字角标）
-- 任意对话右上角出现项目标记（`dsh-followup v0.2.0`）
+- 任意对话右上角出现项目标记（`dsh-followup v0.2.1`）
 - 数据目录：`~/.dsh/followup/`（`tasks.json`、`projects.json`）
 
 ## 方式 B：直接从 GitHub 源码装
@@ -94,7 +94,7 @@ CLI 会自动把它加进 `dsh.profile.bundles`，不需要再手工改 `package
 
 ```bash
 dsh plugin --profile web add \
-  "https://github.com/bingomu/dsh-followup/releases/download/v0.2.0/bingomu-dsh-followup-0.2.0.tgz"
+  "https://github.com/bingomu/dsh-followup/releases/download/v0.2.1/bingomu-dsh-followup-0.2.1.tgz"
 ```
 
 然后重启 web 进程。

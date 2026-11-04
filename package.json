@@ -1,6 +1,6 @@
 {
   "name": "@bingomu/dsh-followup",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "A follow-through system for DSH: sidebar nudge, conversation-header control, ledger panel. 对话收尾系统：让每个对话都有始有终。",
   "type": "module",
   "main": "index.js",
