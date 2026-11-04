@@ -182,6 +182,9 @@ function callRoute(handler, method, url, body) {
   const project = join(root, 'proj-x')
   await mkdir(project, { recursive: true })
   await writeFile(join(project, 'package.json'), JSON.stringify({ name: 'proj-x', version: '1.6.0', repository: 'https://github.com/acme/proj-x' }))
+  const nested = join(root, 'container', 'plugin')
+  await mkdir(nested, { recursive: true })
+  await writeFile(join(nested, 'package.json'), JSON.stringify({ name: '@acme/nested-usage', version: '1.0.0', description: '侧栏小票机', keywords: ['usage', 'balance'] }))
   await mkdir(join(home, 'storages'), { recursive: true })
   await writeFile(join(home, 'storages', 'workspace.json'), JSON.stringify({
     global: { archivedSessionIds: [] },
@@ -196,6 +199,9 @@ function callRoute(handler, method, url, body) {
   const rows = await projects.list()
   const row = rows.find((item) => item.path === project)
   check('projects: 发现项目', row !== undefined && row.name === 'proj-x' && row.version === '1.6.0', JSON.stringify(rows.map((item) => item.name)))
+  const nestedRow = rows.find((item) => item.path === nested)
+  check('projects: 发现两层嵌套项目', nestedRow !== undefined && nestedRow.name === 'nested-usage', JSON.stringify(rows.map((item) => item.path)))
+  check('projects: 描述/关键词', nestedRow?.description === '侧栏小票机' && nestedRow?.keywords?.includes('usage'), JSON.stringify(nestedRow?.keywords))
   check('projects: 解析 GitHub', row.github?.owner === 'acme' && row.github?.repo === 'proj-x', JSON.stringify(row.github))
 
   const plain = { version: '0.2.0', facts: { tag: 'v0.1.0', remote: 'https://github.com/acme/x', npm: 'none', market: false, dirty: false }, marks: {} }
@@ -213,6 +219,10 @@ function callRoute(handler, method, url, body) {
   check('projects: cwd 绑定', resolved.record?.path === project && resolved.via === 'cwd', JSON.stringify(resolved.via))
   const byTitle = projects.resolveSession('s2', { cwd: '/elsewhere', title: 'proj-x 发布准备' })
   check('projects: 标题绑定', byTitle.record?.path === project && byTitle.via === 'title', JSON.stringify(byTitle.via))
+  const byHints = projects.resolveSession('s3', { cwd: '/elsewhere', title: '重做 DSH 用量插件设计', hints: ['usage-card/design-demo.html'] })
+  check('projects: 关键词/上下文绑定', byHints.record?.path === nested && byHints.via === 'context', JSON.stringify(byHints))
+  const byWorkspace = projects.resolveSession('s4', { cwd: join(root, 'container'), title: '', hints: [] })
+  check('projects: 工作区下唯一项目直接锁定', byWorkspace.record?.path === nested && byWorkspace.via === 'cwd', JSON.stringify(byWorkspace))
   const byContext = projects.resolveSession('s4', { cwd: '/elsewhere', title: '随便聊聊', hints: ['我们继续做 proj-x 的 v1.6 发布'] })
   check('projects: 上下文绑定', byContext.record?.path === project && byContext.via === 'context', JSON.stringify(byContext.via))
   const scores = projects.scoreProjects('随便聊聊', ['我们继续做 proj-x 的 v1.6 发布'])

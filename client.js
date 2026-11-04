@@ -1479,7 +1479,7 @@ window.__ModuleLoader__.load({
       const needle = query.trim().toLowerCase()
       const filtered = needle.length === 0
         ? all
-        : all.filter((candidate) => `${candidate.name ?? ''} ${candidate.path ?? ''}`.toLowerCase().includes(needle))
+        : all.filter((candidate) => `${candidate.name ?? ''} ${candidate.path ?? ''} ${candidate.description ?? ''} ${Array.isArray(candidate.keywords) ? candidate.keywords.join(' ') : ''}`.toLowerCase().includes(needle))
       const guess = needle.length === 0 ? (data?.guess ?? null) : null
       const guessEl = guess === null
         ? null
