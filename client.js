@@ -86,6 +86,10 @@ window.__ModuleLoader__.load({
           pickProject: '选一个项目',
           searchProject: '搜索项目名…',
           guess: '猜你在做',
+          inferred: '推定',
+          inferredHint: '按对话内容和标题推定',
+          reasonTitle: '标题提到',
+          reasonMentions: (n) => `对话提到 ${n} 次`,
           noMatch: '没有匹配的项目',
           dirtyTag: '有改动',
           release: '最近发布',
@@ -180,6 +184,10 @@ window.__ModuleLoader__.load({
           pickProject: 'Pick a project',
           searchProject: 'Search projects…',
           guess: 'Looks like',
+          inferred: 'inferred',
+          inferredHint: 'inferred from the conversation and title',
+          reasonTitle: 'in title',
+          reasonMentions: (n) => `mentioned ${n}×`,
           noMatch: 'No matching project',
           dirtyTag: 'dirty',
           release: 'Last release',
@@ -718,8 +726,11 @@ window.__ModuleLoader__.load({
       .fu-hbadge:hover{background:var(--dsw-alias-bg-layer-2,#f7f8fa)}
       .fu-hbadge .fu-hdot{flex:none;width:6px;height:6px;border-radius:50%;background:#b9bfcc}
       .fu-hbadge-on .fu-hdot{background:#3c8a58}
+      .fu-hbadge-soft .fu-hdot{background:#7fae8f}
       .fu-hbadge-quiet .fu-hdot{background:#c9cdd6}
       .fu-hbadge .fu-hlabel{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+      .fu-pop-infer{flex:none;font-size:9.5px;line-height:1.7;padding:0 5px;border-radius:4px;
+        background:rgba(127,174,143,.16);color:#3f6b4c;white-space:nowrap}
 
       .fu-pop{position:fixed;z-index:2147482700;width:min(370px,92vw);max-height:min(520px,80vh);overflow:auto;padding:12px;
         border-radius:14px;border:1px solid var(--dsw-alias-border-l3,rgba(0,0,0,.08));background:var(--dsw-alias-bg-layer-1,#fff);
@@ -762,6 +773,7 @@ window.__ModuleLoader__.load({
         font:inherit;font-size:12px;color:var(--dsw-alias-label-primary,#1f2328);cursor:pointer;text-align:left}
       .fu-pick:hover{background:var(--dsw-alias-interactive-bg-hover,rgba(0,0,0,.05))}
       .fu-pick-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+      .fu-pick-reason{flex:none;font-size:10px;color:var(--dsw-alias-label-tertiary,#8b93a5);white-space:nowrap}
       .fu-pick small{color:var(--dsw-alias-label-tertiary,#8b93a5);font-size:10px}
       @keyframes fu-pop-in{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
 
@@ -1428,11 +1440,15 @@ window.__ModuleLoader__.load({
 
     /** 弹层内容。 */
     function buildHeaderPopover(options) {
-      const { project, channel, data, busy, picker, pos, popRef } = options
+      const { project, channel, data, busy, picker, pos, popRef, via } = options
       const releases = project?.releases ?? null
+      const inferred = via === 'title' || via === 'context'
       const children = []
       children.push(React.createElement('div', { className: 'fu-pop-head', key: 'head' },
         React.createElement('span', { className: 'fu-pop-name' }, project !== null ? project.name : (data === null ? T.loading : T.noProject)),
+        project !== null && inferred
+          ? React.createElement('span', { className: 'fu-pop-infer', title: T.inferredHint }, T.inferred)
+          : null,
         project !== null && typeof project.version === 'string'
           ? React.createElement('span', { className: 'fu-pop-ver' }, `v${project.version}`)
           : null,
@@ -1480,23 +1496,34 @@ window.__ModuleLoader__.load({
       const filtered = needle.length === 0
         ? all
         : all.filter((candidate) => `${candidate.name ?? ''} ${candidate.path ?? ''} ${candidate.description ?? ''} ${Array.isArray(candidate.keywords) ? candidate.keywords.join(' ') : ''}`.toLowerCase().includes(needle))
-      const guess = needle.length === 0 ? (data?.guess ?? null) : null
-      const guessEl = guess === null
-        ? null
-        : React.createElement('div', { key: 'guess' },
+      // 有证据的候选最多 3 个：标题命中或对话里提到过。并列时也列出来让用户点。
+      const suggested = (Array.isArray(data?.suggested) && data.suggested.length > 0 ? data.suggested : all)
+        .filter((candidate) => candidate?.titleHit === true || candidate?.mentions > 0 || candidate?.match >= 2)
+        .slice(0, 3)
+      const reasonOf = (candidate) => {
+        if (candidate?.titleHit === true) return T.reasonTitle
+        if (typeof candidate?.mentions === 'number' && candidate.mentions > 0) return T.reasonMentions(candidate.mentions)
+        return null
+      }
+      const suggestEl = needle.length === 0 && suggested.length > 0
+        ? React.createElement('div', { key: 'suggest' },
             React.createElement('div', { className: 'fu-pop-label' }, T.guess),
-            React.createElement('button', {
-              type: 'button',
-              className: 'fu-pick fu-pick-guess',
-              disabled: busy,
-              onClick: () => options.onBind(guess.path),
-            },
-              React.createElement('span', { className: 'fu-pick-name' }, guess.name),
-              releaseChip(guess),
-              React.createElement('small', null, [typeof guess.version === 'string' ? `v${guess.version}` : '', typeof guess.lastActive === 'number' ? formatAge(guess.lastActive) : ''].filter(Boolean).join(' · ')),
-              dirtyChip(guess),
-            ),
+            suggested.map((candidate) => {
+              const reason = reasonOf(candidate)
+              return React.createElement('button', {
+                type: 'button',
+                key: candidate.path,
+                className: 'fu-pick fu-pick-guess',
+                title: candidate.name,
+                disabled: busy,
+                onClick: () => options.onBind(candidate.path),
+              },
+                React.createElement('span', { className: 'fu-pick-name' }, candidate.name),
+                reason === null ? null : React.createElement('span', { className: 'fu-pick-reason' }, reason),
+              )
+            }),
           )
+        : null
       const pickerEl = React.createElement('div', { className: 'fu-picker', key: 'picker' },
         React.createElement('input', {
           key: 'search',
@@ -1510,7 +1537,7 @@ window.__ModuleLoader__.load({
             if (event.key === 'Enter' && filtered.length > 0) options.onBind(filtered[0].path)
           },
         }),
-        guessEl,
+        suggestEl,
         React.createElement('div', { key: 'label', className: 'fu-pop-label' },
           needle.length === 0 ? `${T.pickProject} · ${all.length}` : `${T.pickProject} · ${filtered.length}`),
         filtered.length === 0
@@ -1636,6 +1663,7 @@ window.__ModuleLoader__.load({
             value = {
               ...value,
               candidates: (value?.candidates ?? []).map(attach),
+              suggested: (value?.suggested ?? []).map(attach),
               guess: attach(value?.guess),
             }
           }
@@ -1667,6 +1695,8 @@ window.__ModuleLoader__.load({
       const project = data?.project ?? null
       const channel = project?.channel ?? {}
       const version = project?.version
+      const via = data?.via ?? null
+      const inferred = via === 'title' || via === 'context'
 
       const act = async (patch) => {
         if (project === null || busy) return
@@ -1763,7 +1793,7 @@ window.__ModuleLoader__.load({
       const label = project === null
         ? T.mark
         : `${project.name ?? ''}${typeof version === 'string' && version.length > 0 ? ` v${version}` : ''}`
-      const anyChannel = ['github', 'npm', 'market', 'site'].some((key) => channel[key] === true)
+      const badge = project === null ? ' fu-hbadge-quiet' : inferred ? ' fu-hbadge-soft' : ' fu-hbadge-on'
       const ended = data?.session?.endedAt !== null && data?.session?.endedAt !== undefined
 
       const content = buildHeaderPopover({
@@ -1774,6 +1804,7 @@ window.__ModuleLoader__.load({
         picker,
         pos,
         popRef,
+        via,
         onTogglePicker: () => {
           setPicker((value) => !value)
           setQuery('')
@@ -1792,8 +1823,10 @@ window.__ModuleLoader__.load({
         React.createElement('button', {
           type: 'button',
           ref: buttonRef,
-          className: `fu-hbadge${project === null ? ' fu-hbadge-quiet' : anyChannel || channel.devDone ? ' fu-hbadge-on' : ''}`,
-          title: project === null ? T.noProject : `${project.name}${ended ? ` · ${T.endedToast}` : ''}`,
+          className: `fu-hbadge${badge}`,
+          title: project === null
+            ? T.noProject
+            : `${project.name}${inferred ? ` · ${T.inferredHint}` : ''}${ended ? ` · ${T.endedToast}` : ''}`,
           onClick: toggle,
         },
           React.createElement('span', { className: 'fu-hdot' }),

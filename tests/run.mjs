@@ -226,7 +226,7 @@ function callRoute(handler, method, url, body) {
   const byContext = projects.resolveSession('s4', { cwd: '/elsewhere', title: '随便聊聊', hints: ['我们继续做 proj-x 的 v1.6 发布'] })
   check('projects: 上下文绑定', byContext.record?.path === project && byContext.via === 'context', JSON.stringify(byContext.via))
   const scores = projects.scoreProjects('随便聊聊', ['我们继续做 proj-x 的 v1.6 发布'])
-  check('projects: 评分供候选排序', (scores.get(project) ?? 0) >= 2, JSON.stringify([...scores]))
+  check('projects: 评分供候选排序', (scores.get(project)?.score ?? 0) >= 2, JSON.stringify([...scores]))
   await projects.bind('s3', project)
   check('projects: 手动绑定', projects.data.sessions.s3.projectPath === project)
 
@@ -321,6 +321,74 @@ function callRoute(handler, method, url, body) {
   const scheduleIndex = new ScheduleIndex()
   const schedules = await scheduleIndex.list({ get: async () => ({ title: '会话标题' }) })
   check('schedules: 只取 active 且按时间排序', schedules.length === 2 && schedules[0].title === '提交收录' && schedules[0].sessionTitle === '会话标题', JSON.stringify(schedules))
+
+  await rm(home, { recursive: true, force: true })
+  await rm(root, { recursive: true, force: true })
+}
+
+// ------------------------------------------- 项目去重 / 推定绑定（回归）
+{
+  const home = await mkdtemp(join(tmpdir(), 'dsh-followup-dedupe-home-'))
+  const root = await mkdtemp(join(tmpdir(), 'dsh-followup-dedupe-root-'))
+  const current = join(root, 'dsh-followup')
+  const oldCopy = join(root, 'old-workspace', 'dsh-followup')
+  const usage = join(root, 'usage-card')
+  // 旧工作区副本 + 新目录：同名、同仓库，正是这台机器上的真实情况
+  for (const dir of [current, oldCopy]) {
+    await mkdir(dir, { recursive: true })
+    await writeFile(join(dir, 'package.json'), JSON.stringify({
+      name: '@bingomu/dsh-followup',
+      version: '0.2.1',
+      repository: 'https://github.com/bingomu/dsh-followup',
+    }))
+  }
+  await mkdir(usage, { recursive: true })
+  await writeFile(join(usage, 'package.json'), JSON.stringify({ name: 'usage-card', version: '1.2.0', description: '用量卡片' }))
+  await mkdir(join(home, 'storages'), { recursive: true })
+  await writeFile(join(home, 'storages', 'workspace.json'), JSON.stringify({
+    tables: { workspaces: { w1: { path: root } } },
+  }))
+  process.env.DSH_HOME = home
+  globalThis.fetch = async () => { throw new Error('offline in tests') }
+
+  const store = new ProjectStore()
+  await store.ready()
+  await store.scan()
+  // 避免测试结束删临时目录时，后台网络刷新还在往里写
+  const stampedAt = Date.now()
+  for (const record of Object.values(store.data.projects)) record.facts = { ...record.facts, netAt: stampedAt }
+  const rows = await store.list()
+  const followups = rows.filter((row) => row.name === 'dsh-followup')
+  check('projects: 同名同仓库只显示一次', followups.length === 1, JSON.stringify(rows.map((row) => row.path)))
+  check('projects: 去重不丢台账数据',
+    Object.keys(store.data.projects).filter((path) => path.endsWith('/dsh-followup')).length === 2,
+    JSON.stringify(Object.keys(store.data.projects)))
+
+  // 工作区根 cwd：以前两个副本各算 2 分并列 → null；现在去重后唯一 → context
+  const byContext = store.resolveSession('dup-context', {
+    cwd: root,
+    title: '继续做插件',
+    hints: ['dsh-followup 的头部徽章', 'dsh-followup 的去重', '再看 usage-card 的样式'],
+  })
+  check('projects: 重复项目不再互相抵消（去重后 context 锁定）',
+    byContext.record?.name === 'dsh-followup' && byContext.via === 'context',
+    JSON.stringify({ via: byContext.via, name: byContext.record?.name, match: byContext.match }))
+
+  const tie = store.resolveSession('dup-tie', {
+    cwd: '/elsewhere',
+    title: '随便聊聊',
+    hints: ['先看 dsh-followup 再看 usage-card'],
+  })
+  check('projects: 提及次数并列 → 不猜', tie.record === null, JSON.stringify(tie))
+
+  const majority = store.resolveSession('dup-majority', {
+    cwd: '/elsewhere',
+    title: '随便聊聊',
+    hints: ['dsh-followup 的评分', '继续 dsh-followup', 'dsh-followup 测试', 'usage-card 也看看'],
+  })
+  check('projects: 提及多的赢',
+    majority.record?.name === 'dsh-followup' && majority.via === 'context',
+    JSON.stringify({ via: majority.via, name: majority.record?.name, match: majority.match }))
 
   await rm(home, { recursive: true, force: true })
   await rm(root, { recursive: true, force: true })
