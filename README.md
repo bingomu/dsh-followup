@@ -1,7 +1,7 @@
 # dsh-followup · 跟进
 
 ![version](https://img.shields.io/badge/version-0.2.1-4d6bfe)
-[![license](https://img.shields.io/npm/l/@bingomu/dsh-followup.svg)](LICENSE)
+[![license](https://img.shields.io/badge/license-MIT-4d6bfe)](LICENSE)
 [![DSH](https://img.shields.io/badge/DSH-0.2.1--rc.2%2B-4d6bfe)](https://github.com/bingomu/dsh-followup)
 
 > **你开了 12 个对话，没有一个是收尾的。**
