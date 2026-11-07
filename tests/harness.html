@@ -69,8 +69,12 @@
   <script>
     const now = Date.now()
     const DAY = 86400000
-    const FORCE_PICK = new URLSearchParams(location.search).get('mode') === 'pick'
-    const EN = new URLSearchParams(location.search).get('lang') === 'en'
+    const params = new URLSearchParams(location.search)
+    const MODE = params.get('mode') ?? 'sheet'
+    const FORCE_PICK = MODE === 'pick'
+    const EN = params.get('lang') === 'en'
+    // 截图开关：shut=1 时不自动点开头部徽章，弹层保持关闭
+    const SHUT = params.get('shut') === '1'
     const project = {
       path: '/Users/robinham/Documents/deepseek-harness/default-workspace/readable-diagrams',
       name: 'readable-diagrams', dir: 'readable-diagrams', version: '1.1.0', lastActive: now - 2 * DAY,
@@ -101,6 +105,31 @@
       }, status: { key: 'released', label: '已发布' } },
       mark: {}, versionKey: '1.0.1',
     }
+    // mode=tie：多项目并列，用来截「候选 + 理由」。字段照 project 的形状补齐，行才不会缺块。
+    const tieProject = (options) => {
+      const lastActive = now - options.days * DAY
+      return {
+        path: options.path, name: options.name, dir: options.name, version: options.version,
+        lastActive,
+        dirty: options.dirty === true,
+        channel: { devDone: true, github: true, npm: false, market: false, site: false },
+        mark: {}, versionKey: options.version,
+        release: { channel: 'github', label: 'GitHub', at: null, source: 'auto' },
+        releases: { local: options.version, channels: {
+          github: { state: 'on', version: options.version },
+          npm: { state: 'off', version: null },
+          market: { state: 'off', version: null },
+          site: { state: 'off', version: null },
+        }, status: { key: 'released', label: '已发布' } },
+        facts: { tag: `v${options.version}`, lastCommit: new Date(lastActive).toISOString(), dirty: options.dirty === true, remote: `https://github.com/bingomu/${options.name}.git`, npm: 'none', market: false },
+        mentions: options.mentions, titleHit: options.titleHit, match: options.match,
+      }
+    }
+    const tieProjects = [
+      tieProject({ path: '/Users/robinham/Documents/DSH Plugin/dsh-followup', name: 'dsh-followup', version: '0.2.1', days: 1, mentions: 3, titleHit: false, match: 4 }),
+      tieProject({ path: '/Users/robinham/Documents/DSH Plugin/usage-card/plugin', name: 'dsh-usage-printer', version: '1.4.0', days: 2, mentions: 3, titleHit: false, match: 4 }),
+      tieProject({ path: '/Users/robinham/Documents/deepseek-harness/default-workspace/readable-diagrams', name: 'readable-diagrams', version: '1.1.0', days: 3, mentions: 0, titleHit: true, match: 3 }),
+    ]
     const store = {
       tasks: [
         { id: 'f-1', title: '确认 dsh-followup 在桌面端跑通：左栏入口、面板、跳回原对话', done: false, priority: 2, dueAt: now - 2 * 3600 * 1000, createdAt: now - DAY, updatedAt: now - 3 * 3600 * 1000, source: { sessionId: 's1', cwd: '/x/dsh-followup' } },
@@ -154,16 +183,28 @@
         { id: 'sc1', title: '检查 DSH 市场收录状态', at: now + 3 * 3600 * 1000, sessionId: 's-idle', sessionTitle: '图片预览插件开发与发布' },
         { id: 'sc2', title: '提交 dsh-image-zoom 收录 PR', at: now + 26 * 3600 * 1000, sessionId: 's-idle', sessionTitle: '图片预览插件开发与发布' },
       ] })
-      if (path.endsWith('/followup/session')) return respond({
-        session: { id: 's1', title: EN ? 'readable-diagrams release prep' : 'readable-diagrams 发布准备', cwd: project.path, endedAt: null },
-        project: FORCE_PICK ? null : project,
-        via: FORCE_PICK ? null : 'title',
-        guess: (() => { const { lastActive, ...rest } = project; return rest })(),
-        candidates: [project, project2].map((p, index) => {
-          const { lastActive, ...rest } = p
-          return { ...rest, match: index === 0 ? 4 : 2 }
-        }),
-      })
+      if (path.endsWith('/followup/session')) {
+        if (MODE === 'tie') {
+          return respond({
+            session: { id: 's1', title: EN ? 'Workspace discussion' : '工作区里的多项目讨论', cwd: '/Users/robinham/Documents/DSH Plugin', endedAt: null },
+            project: null,
+            via: null,
+            guess: null,
+            suggested: tieProjects,
+            candidates: tieProjects,
+          })
+        }
+        return respond({
+          session: { id: 's1', title: EN ? 'readable-diagrams release prep' : 'readable-diagrams 发布准备', cwd: project.path, endedAt: null },
+          project: FORCE_PICK ? null : project,
+          via: FORCE_PICK ? null : 'title',
+          guess: (() => { const { lastActive, ...rest } = project; return rest })(),
+          candidates: [project, project2].map((p, index) => {
+            const { lastActive, ...rest } = p
+            return { ...rest, match: index === 0 ? 4 : 2 }
+          }),
+        })
+      }
       if (path.endsWith('/followup/add')) {
         const body = JSON.parse(init.body)
         const task = { id: 'f-new', title: body.title, done: false, createdAt: Date.now(), updatedAt: Date.now(), source: { sessionId: 's1', cwd: '/x' } }
@@ -250,10 +291,17 @@
       React.createElement(header.component, { sessionId: 's1' }),
     )
 
-    const mode = new URLSearchParams(location.search).get('mode') ?? 'sheet'
+    const mode = MODE
     setTimeout(() => {
+      if (mode === 'tie') {
+        const fakeTitle = document.querySelector('.fake-title')
+        if (fakeTitle) fakeTitle.textContent = EN ? 'Conversation · workspace' : '对话 · 工作区'
+        if (!SHUT) document.querySelector('.fu-hbadge').click()
+        setTimeout(() => { window.__FU_READY__ = true }, 700)
+        return
+      }
       if (mode === 'header' || mode === 'pick') {
-        document.querySelector('.fu-hbadge').click()
+        if (!SHUT) document.querySelector('.fu-hbadge').click()
         setTimeout(() => { window.__FU_READY__ = true }, 700)
         return
       }
