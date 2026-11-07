@@ -6,7 +6,7 @@
 
 [中文](README.md)
 
-![dsh-followup follow-through](https://raw.githubusercontent.com/bingomu/dsh-followup/main/assets/hero-en-1200x630.png?v=021)
+![dsh-followup follow-through](https://raw.githubusercontent.com/bingomu/dsh-followup/main/assets/hero-en-1200x630.png?v=023)
 
 
 ## Positioning
