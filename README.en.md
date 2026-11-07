@@ -1,8 +1,8 @@
 # dsh-followup · Follow-up
 
-> **A follow-through system for the AI era. Every conversation gets an ending.**
+> **You opened twelve conversations. Not one of them is closed.**
 >
-> The conversation header is the control: mark state, align with the project, decide when it is done. Left is the nudge; the right panel is the ledger.
+> This plugin covers the stretch between starting something and finishing it: mark state in the conversation header, see what is still open in the sidebar, and read the ledger of every open item in the right panel.
 
 [中文](README.md)
 
@@ -11,7 +11,7 @@
 
 ## Positioning
 
-AI multiplies chats, projects and tasks, fragments attention, and leaves things unfinished. This connects the start to the ending, in three layers:
+AI multiplies chats, projects and tasks, and fragments attention. Plenty of starts — a PR, a release, an "I'll come back to that" — and very few endings. This connects the start to the ending, in three layers:
 
 | Layer | Where | What |
 |---|---|---|
